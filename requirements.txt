@@ -1,5 +1,4 @@
 crewai
-crewai_tools
 load_dotenv
 langchain
 langchain_google_genai
