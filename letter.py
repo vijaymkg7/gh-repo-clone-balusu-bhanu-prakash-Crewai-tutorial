@@ -5,18 +5,16 @@ import asyncio
 import streamlit as st
 
 # Streamlit UI setup
-st.title("❤️ AI Love Letter Generator")
-st.sidebar.header("Love Configuration")
+st.title("Code migrator </>")
+st.sidebar.header("Configuration")
 
 # Input fields
-proposer_name = st.sidebar.text_input("Your Name", "John")
-recipient_name = st.sidebar.text_input("Their Name", "Jane")
-proposer_backstory = st.sidebar.text_area(
-    "Your Personality", "Nervous but romantic introvert"
+java_version = st.sidebar.text_area(
+    "/java version", 11
 )
-recipient_backstory = st.sidebar.text_area(
-    "Their Personality", "Values small genuine gestures over grand romantic displays"
-)
+uploaded_file = st.sidebar.file_uploader("Upload Java File", type=['java'])
+code = uploaded_file.getvalue().decode()
+obj = st.sidebar.text_area("Your objective", f"Upgrade this code to java version {java_version}")
 temperature = st.sidebar.slider("Creativity Level", 0.0, 1.0, 0.5)
 
 
@@ -25,7 +23,7 @@ def create_llm():
     return ChatGoogleGenerativeAI(
         model="gemini-1.5-flash-8b",
         temperature=temperature,
-        google_api_key=os.getenv("GEMINI_API_KEY"),
+        google_api_key=os.getenv("GOOGLE_API_KEY"),
     )
 
 
@@ -38,93 +36,93 @@ except RuntimeError:
 llm = create_llm()
 
 # Agent definitions
-proposer = Agent(
-    role=f"Romantic Writer ({proposer_name})",
-    goal=f"Write heartfelt letters FROM {proposer_name} TO {recipient_name}",
-    backstory=proposer_backstory,
-    llm=llm,
-    constraints=[
-        f"ALWAYS write from {proposer_name}'s perspective",
-        "Never mention writing a letter itself",
-        "Focus on specific shared memories",
-    ],
+rewriter = Agent(
+    role = "Code rewriter",
+    goal = "Rewrite code to meet the objective",
+    backstory = "Expert in code rewriter",
+    llm = llm,
+    verbose = True,
+    allow_delegation = False,
 )
 
 analyst = Agent(
-    role="Relationship Analyst",
-    goal=f"Analyze text compatibility FOR {recipient_name}'s personality",
-    backstory=f"Expert in {recipient_name}'s preferences: {recipient_backstory}",
+    role="Code analyst",
+    goal="Analyze code and provide feedback",
+    backstory="Expert in code analysis",
     llm=llm,
-    constraints=[
-        "Never write any part of a letter",
-        "Only provide bullet-point analysis",
-        "Focus on emotional authenticity",
-    ],
+    verbose=True,
+    allow_delegation=False,
 )
 
 # Task pipeline
 draft_task = Task(
-    description=f"Write initial letter from {proposer_name} to {recipient_name}",
-    agent=proposer,
-    expected_output=f"300-character letter FROM {proposer_name} TO {recipient_name}",
+    description=f"Rewrite the {code} to {obj}",
+    agent=rewriter,
+    expected_output=f"Partially rewritten code to meet the {obj}",
+    context=[code],
     output_file="draft.txt",
 )
 
 analysis_task = Task(
-    description=f"Analyze draft for alignment with {recipient_name}'s personality",
+    description=f"Analyze the {code} and provide feedback {obj}",
     agent=analyst,
-    expected_output="3-5 bullet points of constructive feedback",
-    context=[draft_task],
+    expected_output=f"Analysis of the code with respect to compilation errors",
+    context=[code,obj],
     output_file="analysis.txt",
 )
 
-final_letter_task = Task(
-    description=f"Incorporate feedback to refine the letter, ensuring it aligns closely with the context and feels natural. Avoid over-polishing; focus on making it meaningful and relevant.",
-    agent=proposer,
-    expected_output=f"A 400-character letter FROM {proposer_name} TO {recipient_name} that is contextually rich, authentic, and matches the tone of the situation.",
+final_code_task = Task(
+    description=f"Rewrite the code to meet the {obj}",
+    agent=rewriter,
+    expected_output=f"Fully rewritten code to meet the {obj}",
     context=[analysis_task],
-    output_file="final.txt",
+    output_file="final_code.txt",
 )
 
 # Crew setup
 love_crew = Crew(
-    agents=[proposer, analyst],
-    tasks=[draft_task, analysis_task, final_letter_task],
+    agents=[rewriter, analyst],
+    tasks=[analysis_task],
     verbose=1,
 )
 
 # Generate button
-if st.button("✨ Create Love Letter"):
-    with st.spinner("Crafting your perfect message..."):
+if st.button("✨ Ugrade code"):
+    with st.spinner(" Rewriting your code"):
         try:
             # Execute workflow
             love_crew.kickoff()
 
             # Get final output
-            final_letter = final_letter_task.output.raw_output
+            final_code = analysis_task.output.result
 
-            # Validate sender orientation
-            if f"From {proposer_name}" not in final_letter:
-                final_letter = f"{final_letter}"
+            # Create columns for side-by-side display
+            col1, col2 = st.columns([1, 1])
 
-            # Display formatted letter
-            st.subheader(f"From {proposer_name} to {recipient_name}")
-            st.markdown(
-                f"""
-            <div style="
-                background: #fff5f8;
-                padding: 25px;
-                border-radius: 15px;
-                font-family: 'Georgia', serif;
-                line-height: 1.8;
-                color: #4a4a4a;
-                white-space: pre-wrap;
-            ">
-            💌 {final_letter}
-            </div>
-            """,
-                unsafe_allow_html=True,
+            # Display original code on left side
+            with col1:
+                st.subheader("Original Code")
+                st.code(
+                    code,
+                    language="java",
+                    line_numbers=True
+                )
+
+            # Display upgraded code on right side
+            with col2:
+                st.subheader("Upgraded Code") 
+                st.code(
+                    final_code,
+                    language="java",
+                    line_numbers=True
+                )            
+                # Add download button
+            st.download_button(
+                label="Download Code",
+                data=final_code,
+                file_name="upgraded_code.java",
+                mime="text/plain"
             )
 
         except Exception as e:
-            st.error(f"Couldn't create letter: {str(e)}")
+            st.error(f"Couldn't upgrade code: {str(e)}")
