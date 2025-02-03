@@ -5,18 +5,29 @@ import asyncio
 import streamlit as st
 
 # Streamlit UI setup
+st.set_page_config( layout="wide")
 st.title("Code migrator </>")
 st.sidebar.header("Configuration")
 
+st.markdown("""
+    <style>
+    body, html {
+        overflow: hidden;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 # Input fields
 java_version = st.sidebar.text_area(
-    "/java version", 11
+    "/java version",""
 )
 uploaded_file = st.sidebar.file_uploader("Upload Java File", type=['java'])
-code = uploaded_file.getvalue().decode()
+if uploaded_file is not None:
+    code = uploaded_file.getvalue().decode()
+else:
+    code = ""
 obj = st.sidebar.text_area("Your objective", f"Upgrade this code to java version {java_version}")
-temperature = st.sidebar.slider("Creativity Level", 0.0, 1.0, 0.5)
-
+temperature = st.sidebar.slider("Temperature", 0.0, 1.0, 0.5)
 
 # LLM initialization
 def create_llm():
@@ -80,7 +91,7 @@ final_code_task = Task(
 )
 
 # Crew setup
-love_crew = Crew(
+code_crew = Crew(
     agents=[rewriter, analyst],
     tasks=[analysis_task],
     verbose=1,
@@ -88,34 +99,43 @@ love_crew = Crew(
 
 # Generate button
 if st.button("✨ Ugrade code"):
+
     with st.spinner(" Rewriting your code"):
         try:
             # Execute workflow
-            love_crew.kickoff()
+            code_crew.kickoff()
 
             # Get final output
             final_code = analysis_task.output.result
 
+            
             # Create columns for side-by-side display
-            col1, col2 = st.columns([1, 1])
-
+            col1, col2 = st.columns([4, 4])
+            
             # Display original code on left side
             with col1:
+                
                 st.subheader("Original Code")
-                st.code(
-                    code,
-                    language="java",
-                    line_numbers=True
-                )
+                with st.container():
+                    st.markdown('<div class="scrollable-container">', unsafe_allow_html=True)
+                    st.code(
+                        code,
+                        language="java",
+                        line_numbers=True
+                    )
+                    st.markdown('</div>', unsafe_allow_html=True)
 
             # Display upgraded code on right side
             with col2:
                 st.subheader("Upgraded Code") 
-                st.code(
-                    final_code,
-                    language="java",
-                    line_numbers=True
-                )            
+                with st.container():
+                    st.markdown('<div class="scrollable-container">', unsafe_allow_html=True)
+                    st.code(
+                        final_code,
+                        language="java",  
+                        line_numbers=True
+                    )       
+                    st.markdown('</div>', unsafe_allow_html=True)     
                 # Add download button
             st.download_button(
                 label="Download Code",
