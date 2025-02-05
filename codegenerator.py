@@ -26,7 +26,7 @@ class CodeMigrator:
             """, unsafe_allow_html=True)
 
         self.java_version = st.sidebar.text_area("/java version", "")
-        self.uploaded_file = st.sidebar.file_uploader("Upload Java File", type=['java'])
+        self.uploaded_file = st.sidebar.file_uploader("Upload File", type=['java', 'xml'])    
         if self.uploaded_file is not None:
             self.code = self.uploaded_file.getvalue().decode()
         else:
@@ -50,8 +50,8 @@ class CodeMigrator:
     def setup_agents(self):
         self.rewriter = Agent(
             role="Code rewriter",
-            goal="Rewrite code to meet the objective",
-            backstory="Expert in code rewriter",
+            goal=f"Rewrite full code to meet the objective {self.java_version} {self.code} {self.obj}",
+            backstory=f"Expert in code rewriter {self.java_version} {self.code} {self.obj}",
             llm=self.llm,
             verbose=True,
             allow_delegation=False,
@@ -59,24 +59,19 @@ class CodeMigrator:
 
         self.analyst = Agent(
             role="Code analyst", 
-            goal="Analyze code and provide feedback",
-            backstory="Expert in code analysis",
+            goal=f"Analyze code and provide feedback {self.java_version} {self.code} {self.obj}",
+            backstory=f"Expert in code analysis {self.java_version} {self.code} {self.obj}",
             llm=self.llm,
             verbose=True,
             allow_delegation=False,
         )
 
     def setup_tasks(self):
-        self.draft_task = Task(
-            description=f"Rewrite the {self.code} to {self.obj}",
-            agent=self.rewriter,
-            expected_output=f"Partially rewritten code to meet the {self.obj}",
-            context=[self.code],
-            output_file="draft.txt",
-        )
-
+        # We only need two tasks:
+        # 1. Analysis task to understand the code and identify needed changes
+        # 2. Final code task to implement the changes based on analysis
         self.analysis_task = Task(
-            description=f"Analyze the {self.code} and provide feedback {self.obj}",
+            description=f"Analyze the {self.code} {self.obj}",
             agent=self.analyst,
             expected_output=f"Analysis of the code with respect to compilation errors",
             context=[self.code, self.obj],
@@ -84,9 +79,9 @@ class CodeMigrator:
         )
 
         self.final_code_task = Task(
-            description=f"Rewrite the code to meet the {self.obj}",
+            description=f"Rewrite the full code to meet the {self.code} {self.obj}",
             agent=self.rewriter,
-            expected_output=f"Fully rewritten code to meet the {self.obj}",
+            expected_output=f"Fully rewritten code to meet the {self.code} {self.obj}",
             context=[self.analysis_task],
             output_file="final_code.txt",
         )
@@ -94,7 +89,7 @@ class CodeMigrator:
     def setup_crew(self):
         self.code_crew = Crew(
             agents=[self.rewriter, self.analyst],
-            tasks=[self.analysis_task],
+            tasks=[self.analysis_task, self.final_code_task],
             verbose=1,
         )
 
@@ -135,7 +130,7 @@ class CodeMigrator:
             with st.spinner(" Rewriting your code"):
                 try:
                     self.code_crew.kickoff()
-                    final_code = self.analysis_task.output.result
+                    final_code = self.final_code_task.output.result
                     self.display_code(final_code)
                 except Exception as e:
                     st.error(f"Couldn't upgrade code: {str(e)}")
