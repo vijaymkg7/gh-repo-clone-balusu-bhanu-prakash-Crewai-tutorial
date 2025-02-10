@@ -76,20 +76,33 @@ class CodeMigrator:
         # 1. Analysis task to understand the code and identify needed changes
         # 2. Final code task to implement the changes based on analysis
         self.analysis_task = Task(
-            description=f"Analyze the {self.code} {self.obj}",
-            agent=self.analyst,
-            expected_output=f"Analysis of the code with respect to compilation errors",
-            context=[self.code, self.obj],
-            output_file="analysis.txt",
+        description="Analyze the uploaded Java code and provide feedback on potential issues.",
+        agent=self.analyst,
+        expected_output="Detailed analysis of the code with respect to compilation errors and improvements.",
+        context=[
+            {
+                "description": "Raw Java code uploaded by the user.",
+                "expected_output": "The raw Java source code for analysis.",
+                "code": self.code,
+                "objective": self.obj,
+            }
+        ],  # ✅ Now includes required fields
+        output_file="analysis.txt",
         )
 
         self.final_code_task = Task(
-            description=f"Rewrite the full code to meet the {self.code} {self.obj}",
-            agent=self.rewriter,
-            expected_output=f"Fully rewritten code to meet the {self.code} {self.obj}",
-            context=[self.analysis_task],
-            output_file="final_code.txt",
-        )
+              description="Rewrite the full code to meet the specified Java version requirements.",
+              agent=self.rewriter,
+              expected_output="Fully rewritten and upgraded Java code.",
+              context=[
+                  {
+                      "description": "Analysis results with identified issues and suggestions.",
+                      "expected_output": "Insights on compilation errors and improvements.",
+                      "analysis": self.analysis_task.expected_output,  # ✅ Use analysis output properly
+                  }
+              ],  # ✅ Now contains required fields
+              output_file="final_code.txt",
+          )
 
     def setup_crew(self):
         self.code_crew = Crew(
