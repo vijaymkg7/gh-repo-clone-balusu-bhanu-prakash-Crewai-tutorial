@@ -42,16 +42,16 @@ class CodeMigrator:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
 
-        #return ChatGoogleGenerativeAI(
-        #     # model="gemini-1.5-flash-8b",
-        #     # temperature=self.temperature,
-        #     # google_api_key=os.getenv("GOOGLE_API_KEY"),
-            
-        # )
-        return Ollama(
-                model="deepseek-r1:1.5b"
+        return ChatGoogleGenerativeAI(
+            model="gemini-1.5-flash-8b",
+            temperature=self.temperature,
+            google_api_key=os.getenv("GOOGLE_API_KEY"),
             
         )
+        # return Ollama(
+        #         model="deepseek-r1:1.5b"
+            
+        # )
     def setup_agents(self):
         self.rewriter = Agent(
             role="Code rewriter",

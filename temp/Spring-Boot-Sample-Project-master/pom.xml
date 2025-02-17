@@ -1,0 +1,100 @@
+<ns0:project xmlns:ns0="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<ns0:modelVersion>4.0.0</ns0:modelVersion>
+	<ns0:parent>
+		<ns0:groupId>org.springframework.boot</ns0:groupId>
+		<ns0:artifactId>spring-boot-starter-parent</ns0:artifactId>
+		<ns0:version>2.1.3.RELEASE</ns0:version>
+		<ns0:relativePath />
+	</ns0:parent>
+	<ns0:groupId>com.demo</ns0:groupId>
+	<ns0:artifactId>BankApplicationBackend</ns0:artifactId>
+	<ns0:version>0.0.1-SNAPSHOT</ns0:version>
+	<ns0:name>BankApplicationBackend</ns0:name>
+
+	<ns0:properties>
+		<ns0:java.version>21</ns0:java.version>
+	</ns0:properties>
+
+	<ns0:dependencies>
+		<ns0:dependency>
+			<ns0:groupId>org.springframework.boot</ns0:groupId>
+			<ns0:artifactId>spring-boot-starter-data-jpa</ns0:artifactId>
+		</ns0:dependency>
+		<ns0:dependency>
+			<ns0:groupId>org.springframework.boot</ns0:groupId>
+			<ns0:artifactId>spring-boot-starter-data-rest</ns0:artifactId>
+		</ns0:dependency>
+		<ns0:dependency>
+			<ns0:groupId>org.springframework.boot</ns0:groupId>
+			<ns0:artifactId>spring-boot-starter-hateoas</ns0:artifactId>
+		</ns0:dependency>
+		
+		
+		
+		
+		<ns0:dependency>
+			<ns0:groupId>org.springframework.boot</ns0:groupId>
+			<ns0:artifactId>spring-boot-starter-security</ns0:artifactId>
+		</ns0:dependency>
+		<ns0:dependency>
+			<ns0:groupId>org.springframework.security</ns0:groupId>
+			<ns0:artifactId>spring-security-jwt</ns0:artifactId>
+			<ns0:version>1.0.7.RELEASE</ns0:version>
+		</ns0:dependency>
+		<ns0:dependency>
+			<ns0:groupId>com.auth0</ns0:groupId>
+			<ns0:artifactId>java-jwt</ns0:artifactId>
+			<ns0:version>3.4.0</ns0:version>
+		</ns0:dependency>
+
+		<ns0:dependency>
+			<ns0:groupId>mysql</ns0:groupId>
+			<ns0:artifactId>mysql-connector-java</ns0:artifactId>
+		</ns0:dependency>
+
+		<ns0:dependency>
+			<ns0:groupId>com.h2database</ns0:groupId>
+			<ns0:artifactId>h2</ns0:artifactId>
+			<ns0:scope>runtime</ns0:scope>
+		</ns0:dependency>
+		<ns0:dependency>
+			<ns0:groupId>org.projectlombok</ns0:groupId>
+			<ns0:artifactId>lombok</ns0:artifactId>
+			<ns0:optional>true</ns0:optional>
+		</ns0:dependency>
+		<ns0:dependency>
+			<ns0:groupId>org.springframework.boot</ns0:groupId>
+			<ns0:artifactId>spring-boot-starter-test</ns0:artifactId>
+			<ns0:scope>test</ns0:scope>
+		</ns0:dependency>
+	</ns0:dependencies>
+
+	<ns0:build>
+		<ns0:plugins>
+			<ns0:plugin>
+				<ns0:groupId>org.springframework.boot</ns0:groupId>
+				<ns0:artifactId>spring-boot-maven-plugin</ns0:artifactId>
+			</ns0:plugin>
+			<ns0:plugin>
+				<ns0:groupId>org.jacoco</ns0:groupId>
+				<ns0:artifactId>jacoco-maven-plugin</ns0:artifactId>
+				<ns0:version>0.7.6.201602180812</ns0:version>
+				<ns0:executions>
+					<ns0:execution>
+						<ns0:id>prepare-agent</ns0:id>
+						<ns0:goals>
+							<ns0:goal>prepare-agent</ns0:goal>
+						</ns0:goals>
+					</ns0:execution>
+				</ns0:executions>
+			</ns0:plugin>
+			<ns0:plugin>
+				<ns0:groupId>org.eluder.coveralls</ns0:groupId>
+				<ns0:artifactId>coveralls-maven-plugin</ns0:artifactId>
+				<ns0:version>4.3.0</ns0:version>
+			</ns0:plugin>
+
+		</ns0:plugins>
+	</ns0:build>
+
+</ns0:project>
