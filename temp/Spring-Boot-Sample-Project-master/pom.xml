@@ -12,7 +12,7 @@
 	<ns0:name>BankApplicationBackend</ns0:name>
 
 	<ns0:properties>
-		<ns0:java.version>21</ns0:java.version>
+		<ns0:java.version>17</ns0:java.version>
 	</ns0:properties>
 
 	<ns0:dependencies>

@@ -3,6 +3,7 @@ import streamlit as st
 from crewai import Agent, Task, Crew, Process
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.tools import Tool
+from langchain_community.llms import Ollama
 import zipfile
 import xml.etree.ElementTree as ET
 import os
@@ -18,11 +19,12 @@ def create_llm():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
-    return ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash-8b", 
-        temperature=0.7,
-        google_api_key=os.getenv("GOOGLE_API_KEY"),
-    )
+    # return ChatGoogleGenerativeAI(
+    #     model="gemini-1.5-flash-8b", 
+    #     temperature=0.7,
+    #     google_api_key=os.getenv("GOOGLE_API_KEY"),
+    # )
+    return Ollama(model="deepseek-coder-v2:16b")
 
 llm = create_llm()
 # Create agents
